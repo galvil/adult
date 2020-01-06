@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Autors: Josep Alòs Pascual i Daniel Galan Vilella" />
@@ -287,7 +288,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -361,18 +361,6 @@ summary {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
@@ -400,136 +388,295 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#descripcio-del-dataset"><span class="toc-section-number">1</span> Descripció del dataset</a></li>
-<li><a href="#importancia-i-objectius-de-lanalisi"><span class="toc-section-number">2</span> Importància i objectius de l’anàlisi</a></li>
-<li><a href="#neteja-de-les-dades"><span class="toc-section-number">3</span> Neteja de les dades</a></li>
-<li><a href="#analisi-de-les-dades"><span class="toc-section-number">4</span> Anàlisi de les dades</a></li>
-<li><a href="#proves-estadistiques"><span class="toc-section-number">5</span> Proves estadístiques</a></li>
+<li><a href="#descripció-del-dataset"><span class="toc-section-number">1</span> Descripció del dataset</a></li>
+<li><a href="#itegració-i-selecció-de-les-dades-dinterès-a-analitzar"><span class="toc-section-number">2</span> Itegració i selecció de les dades d’interès a analitzar</a></li>
+<li><a href="#neteja-de-les-dades"><span class="toc-section-number">3</span> Neteja de les dades</a><ul>
+<li><a href="#identificació-dinconsistències"><span class="toc-section-number">3.1</span> Identificació d’inconsistències</a></li>
+<li><a href="#identificació-de-valors-buits"><span class="toc-section-number">3.2</span> Identificació de valors buits</a></li>
+<li><a href="#imputació-dels-valors-buits"><span class="toc-section-number">3.3</span> Imputació dels valors buits</a></li>
+<li><a href="#detecció-doutliers"><span class="toc-section-number">3.4</span> Detecció d’outliers</a></li>
+</ul></li>
+<li><a href="#anàlisi-de-les-dades"><span class="toc-section-number">4</span> Anàlisi de les dades</a><ul>
+<li><a href="#selecció-dels-grups-de-dades-que-es-volen-analitzarcomparar"><span class="toc-section-number">4.1</span> Selecció dels grups de dades que es volen analitzar/comparar</a></li>
+<li><a href="#comprovació-de-la-normalitat-i-homogeneïtat-de-la-variància"><span class="toc-section-number">4.2</span> Comprovació de la normalitat i homogeneïtat de la variància</a></li>
+<li><a href="#aplicació-de-proves-estadístiques-per-comparar-els-grups-de-dades."><span class="toc-section-number">4.3</span> Aplicació de proves estadístiques per comparar els grups de dades.</a></li>
+</ul></li>
+<li><a href="#representació-dels-resultats-a-partir-de-taules-i-gràfiques"><span class="toc-section-number">5</span> Representació dels resultats a partir de taules i gràfiques</a></li>
 <li><a href="#conclusions"><span class="toc-section-number">6</span> Conclusions</a></li>
 </ul>
 </div>
 
 <hr />
-<div id="descripcio-del-dataset" class="section level1">
+<div id="descripció-del-dataset" class="section level1">
 <h1><span class="header-section-number">1</span> Descripció del dataset</h1>
 <p>El dataset que utilitzarem per aquesta pràctica és el Adult Data Set que trobem en el següent enllaç: <a href="https://archive.ics.uci.edu/ml/datasets/Adult" class="uri">https://archive.ics.uci.edu/ml/datasets/Adult</a></p>
-<p>Barry Becker va treure l’extracció de la base de dades del cens del 1994. Es va extreure un conjunt de registres raonablement nets mitjançant les condicions següents: ((AAGE&gt; 16) &amp;&amp; (AGI&gt; 100) &amp;&amp; (AFNLWGT&gt; 1) &amp;&amp; (HRSWK&gt; 0))</p>
-<p>La tasca de predicció és determinar si una persona fa més de 50K a l’any.</p>
 <p>Informació sobre els atributs:</p>
-<p>Llista d’atributs:</p>
-<p>&gt; 50 K, &lt;= 50 K.</p>
+<p>Llista d’atributs i el seu tipus:</p>
 <ul>
-<li>edat: contínua.</li>
-<li>lasse de treball: privada, Self-emp-not-inc, Self-emp-inc, Federal-gov, Local-gov, State Gov, Sense pagar, Mai treballat.</li>
-<li>fnlwgt: contínua.</li>
-<li>educació: Batxillers, Some-college, 11è, HS-grad, Prof-school, Assoc-acdm, Assoc-voc, 9a, 7a-8a, 12a, Mestres, 1r-4t, 10a, Doctorat, 5è-6è, preescolar.</li>
-<li>educació-num: contínua.</li>
-<li>estat civil: Esposa de civitat casada, divorciada, mai casada, separada, vídua, casada-cònjuge-absent, casada-AF-cònjuge.</li>
-<li>ocupació: Suport tècnic, Reparació d’artesania, Altres serveis, Vendes, Ex-directiva, Prof-especialitat, Manipuladors-netejadors, màquina-op-inspir, Adm-clerical, Agricultura-pesca, Transport-trasllat, - - Priv-house- servei, servei de protecció, forces armades.</li>
-<li>relació: Esposa, fill propi, marit, no familiar, altre parent, solter.</li>
-<li>raça: Blanc, asiàtic-Pac-Islander, Amer-indi-esquimal, Altres, negre.</li>
-<li>sexe: Dona, Mascle.</li>
-<li>plusvàlua: contínua.</li>
-<li>pèrdua de capital: contínua.</li>
-<li>hores setmanals: contínua.</li>
-<li>país natiu: Estats Units, Cambodja, Anglaterra, Puerto Rico, Canadà, Alemanya, Estats Units (Guam-USVI-etc), Índia, Japó, Grècia, Sud, Xina, Cuba, Iran, Hondures, Filipines, Itàlia , Polònia, Jamaica, Vietnam, - Mèxic, Portugal, Irlanda, França, República Dominicana, Laos, Equador, Taiwan, Haití, Columbia, Hongria, Guatemala, Nicaragua, Escòcia, Tailàndia, Iugoslàvia, El Salvador, Trinadad i Tobago, Perú, Hong , Holanda-Països Baixos.</li>
+<li>age: Variable continua.</li>
+<li>workclass: Categòrica. Possibles valors: <em>Private, Self-emp-not-inc, Self-emp-inc, Federal-gov, Local-gov, State-gov, Without-pay, Never-worked</em>.</li>
+<li>fnlwgt: Variable continua.</li>
+<li>education: Categòrica. Possibles valors: <em>Bachelors, Some-college, 11th, HS-grad, Prof-school, Assoc-acdm, Assoc-voc, 9th, 7th-8th, 12th, Masters, 1st-4th, 10th, Doctorate, 5th-6th, Preschool</em>.</li>
+<li>education-num: Variable continua.</li>
+<li>marital-status: Categòrica. Possibles valors: <em>Married-civ-spouse, Divorced, Never-married, Separated, Widowed, Married-spouse-absent, Married-AF-spouse</em>.</li>
+<li>occupation: Categòrica. Possibles valors: <em>Tech-support, Craft-repair, Other-service, Sales, Exec-managerial, Prof-specialty, Handlers-cleaners, Machine-op-inspct, Adm-clerical, Farming-fishing, Transport-moving, Priv-house-serv, Protective-serv, Armed-Forces</em>.</li>
+<li>relationship: Categòrica. Possibles valors: <em>Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried</em>.</li>
+<li>race: Categòrica. Possibles valors: <em>White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black</em>.</li>
+<li>sex: Categòrica: <em>Female, Male</em>.</li>
+<li>capital-gain: Variable continua.</li>
+<li>capital-loss: Variable continua.</li>
+<li>hours-per-week: Variable continua.</li>
+<li>native-country: Categòrica. Possibles valors: <em>United-States, Cambodia, England, Puerto-Rico, Canada, Germany, Outlying-US(Guam-USVI-etc), India, Japan, Greece, South, China, Cuba, Iran, Honduras, Philippines, Italy, Poland, Jamaica, Vietnam, Mexico, Portugal, Ireland, France, Dominican-Republic, Laos, Ecuador, Taiwan, Haiti, Columbia, Hungary, Guatemala, Nicaragua, Scotland, Thailand, Yugoslavia, El-Salvador, Trinadad&amp;Tobago, Peru, Hong, Holand-Netherlands</em>.</li>
+<li>Income: Categòrica. Possibles valors: <em><span class="math inline">\(&gt;\)</span> 50 K, <span class="math inline">\(&lt;=\)</span> 50 K</em>.</li>
 </ul>
+<p>Com a primer pas carreguem el dataset:</p>
 <hr />
 </div>
-<div id="importancia-i-objectius-de-lanalisi" class="section level1">
-<h1><span class="header-section-number">2</span> Importància i objectius de l’anàlisi</h1>
+<div id="itegració-i-selecció-de-les-dades-dinterès-a-analitzar" class="section level1">
+<h1><span class="header-section-number">2</span> Itegració i selecció de les dades d’interès a analitzar</h1>
+<p>Primer de tot carreguem les dades del conjunt de dades i n’anomenem les columnes:</p>
+<pre class="r"><code># Carreguem el joc de dades
+dadesAdult &lt;- read.csv('adult.data',stringsAsFactors = FALSE,
+                       header = FALSE, strip.white = TRUE)
+
+# Noms dels atributs
+names(dadesAdult) &lt;- c(&quot;age&quot;, &quot;workclass&quot;, &quot;fnlwgt&quot;, &quot;education&quot;, &quot;education-num&quot;,
+                       &quot;marital-status&quot;, &quot;occupation&quot;, &quot;relationship&quot;, &quot;race&quot;,
+                       &quot;sex&quot;, &quot;capital-gain&quot;, &quot;capital-loss&quot;, &quot;hour-per-week&quot;,
+                       &quot;native-country&quot;, &quot;income&quot;)
+
+numericalCols &lt;- c(&quot;age&quot;, &quot;fnlwgt&quot;, &quot;education-num&quot;, &quot;capital-gain&quot;, &quot;capital-loss&quot;,
+                    &quot;hour-per-week&quot;)
+categoricalCols &lt;- c(&quot;workclass&quot;, &quot;education&quot;, &quot;marital-status&quot;,
+                      &quot;occupation&quot;, &quot;relationship&quot;, &quot;race&quot;, &quot;sex&quot;,
+                      &quot;native-country&quot;, &quot;income&quot;)
+
+summary(dadesAdult)</code></pre>
+<pre><code>##       age         workclass             fnlwgt         education        
+##  Min.   :17.00   Length:32561       Min.   :  12285   Length:32561      
+##  1st Qu.:28.00   Class :character   1st Qu.: 117827   Class :character  
+##  Median :37.00   Mode  :character   Median : 178356   Mode  :character  
+##  Mean   :38.58                      Mean   : 189778                     
+##  3rd Qu.:48.00                      3rd Qu.: 237051                     
+##  Max.   :90.00                      Max.   :1484705                     
+##  education-num   marital-status      occupation        relationship      
+##  Min.   : 1.00   Length:32561       Length:32561       Length:32561      
+##  1st Qu.: 9.00   Class :character   Class :character   Class :character  
+##  Median :10.00   Mode  :character   Mode  :character   Mode  :character  
+##  Mean   :10.08                                                           
+##  3rd Qu.:12.00                                                           
+##  Max.   :16.00                                                           
+##      race               sex             capital-gain    capital-loss   
+##  Length:32561       Length:32561       Min.   :    0   Min.   :   0.0  
+##  Class :character   Class :character   1st Qu.:    0   1st Qu.:   0.0  
+##  Mode  :character   Mode  :character   Median :    0   Median :   0.0  
+##                                        Mean   : 1078   Mean   :  87.3  
+##                                        3rd Qu.:    0   3rd Qu.:   0.0  
+##                                        Max.   :99999   Max.   :4356.0  
+##  hour-per-week   native-country        income         
+##  Min.   : 1.00   Length:32561       Length:32561      
+##  1st Qu.:40.00   Class :character   Class :character  
+##  Median :40.00   Mode  :character   Mode  :character  
+##  Mean   :40.44                                        
+##  3rd Qu.:45.00                                        
+##  Max.   :99.00</code></pre>
+<p>Un cop carregades les dades, assignem el tipus correcte a les columnes:</p>
+<pre class="r"><code># Convertim a factors les variables categòriques
+for (i in categoricalCols){
+  dadesAdult[,i] &lt;- as.factor(dadesAdult[,i])
+}
+
+summary(dadesAdult)</code></pre>
+<pre><code>##       age                   workclass         fnlwgt       
+##  Min.   :17.00   Private         :22696   Min.   :  12285  
+##  1st Qu.:28.00   Self-emp-not-inc: 2541   1st Qu.: 117827  
+##  Median :37.00   Local-gov       : 2093   Median : 178356  
+##  Mean   :38.58   ?               : 1836   Mean   : 189778  
+##  3rd Qu.:48.00   State-gov       : 1298   3rd Qu.: 237051  
+##  Max.   :90.00   Self-emp-inc    : 1116   Max.   :1484705  
+##                  (Other)         :  981                    
+##         education     education-num                 marital-status 
+##  HS-grad     :10501   Min.   : 1.00   Divorced             : 4443  
+##  Some-college: 7291   1st Qu.: 9.00   Married-AF-spouse    :   23  
+##  Bachelors   : 5355   Median :10.00   Married-civ-spouse   :14976  
+##  Masters     : 1723   Mean   :10.08   Married-spouse-absent:  418  
+##  Assoc-voc   : 1382   3rd Qu.:12.00   Never-married        :10683  
+##  11th        : 1175   Max.   :16.00   Separated            : 1025  
+##  (Other)     : 5134                   Widowed              :  993  
+##            occupation           relationship                   race      
+##  Prof-specialty :4140   Husband       :13193   Amer-Indian-Eskimo:  311  
+##  Craft-repair   :4099   Not-in-family : 8305   Asian-Pac-Islander: 1039  
+##  Exec-managerial:4066   Other-relative:  981   Black             : 3124  
+##  Adm-clerical   :3770   Own-child     : 5068   Other             :  271  
+##  Sales          :3650   Unmarried     : 3446   White             :27816  
+##  Other-service  :3295   Wife          : 1568                             
+##  (Other)        :9541                                                    
+##      sex         capital-gain    capital-loss    hour-per-week  
+##  Female:10771   Min.   :    0   Min.   :   0.0   Min.   : 1.00  
+##  Male  :21790   1st Qu.:    0   1st Qu.:   0.0   1st Qu.:40.00  
+##                 Median :    0   Median :   0.0   Median :40.00  
+##                 Mean   : 1078   Mean   :  87.3   Mean   :40.44  
+##                 3rd Qu.:    0   3rd Qu.:   0.0   3rd Qu.:45.00  
+##                 Max.   :99999   Max.   :4356.0   Max.   :99.00  
+##                                                                 
+##        native-country    income     
+##  United-States:29170   &lt;=50K:24720  
+##  Mexico       :  643   &gt;50K : 7841  
+##  ?            :  583                
+##  Philippines  :  198                
+##  Germany      :  137                
+##  Canada       :  121                
+##  (Other)      : 1709</code></pre>
 <hr />
 <hr />
 </div>
 <div id="neteja-de-les-dades" class="section level1">
 <h1><span class="header-section-number">3</span> Neteja de les dades</h1>
-<pre class="r"><code># Carreguem el joc de dades
-datosAdult &lt;- read.csv('http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data',stringsAsFactors = FALSE, header = FALSE, strip.white = TRUE)
-
-# Noms dels atributs
-names(datosAdult) &lt;- c(&quot;age&quot;,&quot;workclass&quot;,&quot;fnlwgt&quot;,&quot;education&quot;,&quot;education-num&quot;,&quot;marital-status&quot;,&quot;occupation&quot;,&quot;relationship&quot;,&quot;race&quot;,&quot;sex&quot;,&quot;capital-gain&quot;,&quot;capital-loss&quot;,&quot;hour-per-week&quot;,&quot;native-country&quot;,&quot;income&quot;)
-
-str(datosAdult)</code></pre>
-<pre><code>## 'data.frame':    32561 obs. of  15 variables:
-##  $ age           : int  39 50 38 53 28 37 49 52 31 42 ...
-##  $ workclass     : chr  &quot;State-gov&quot; &quot;Self-emp-not-inc&quot; &quot;Private&quot; &quot;Private&quot; ...
-##  $ fnlwgt        : int  77516 83311 215646 234721 338409 284582 160187 209642 45781 159449 ...
-##  $ education     : chr  &quot;Bachelors&quot; &quot;Bachelors&quot; &quot;HS-grad&quot; &quot;11th&quot; ...
-##  $ education-num : int  13 13 9 7 13 14 5 9 14 13 ...
-##  $ marital-status: chr  &quot;Never-married&quot; &quot;Married-civ-spouse&quot; &quot;Divorced&quot; &quot;Married-civ-spouse&quot; ...
-##  $ occupation    : chr  &quot;Adm-clerical&quot; &quot;Exec-managerial&quot; &quot;Handlers-cleaners&quot; &quot;Handlers-cleaners&quot; ...
-##  $ relationship  : chr  &quot;Not-in-family&quot; &quot;Husband&quot; &quot;Not-in-family&quot; &quot;Husband&quot; ...
-##  $ race          : chr  &quot;White&quot; &quot;White&quot; &quot;White&quot; &quot;Black&quot; ...
-##  $ sex           : chr  &quot;Male&quot; &quot;Male&quot; &quot;Male&quot; &quot;Male&quot; ...
-##  $ capital-gain  : int  2174 0 0 0 0 0 0 0 14084 5178 ...
-##  $ capital-loss  : int  0 0 0 0 0 0 0 0 0 0 ...
-##  $ hour-per-week : int  40 13 40 40 40 40 16 45 50 40 ...
-##  $ native-country: chr  &quot;United-States&quot; &quot;United-States&quot; &quot;United-States&quot; &quot;United-States&quot; ...
-##  $ income        : chr  &quot;&lt;=50K&quot; &quot;&lt;=50K&quot; &quot;&lt;=50K&quot; &quot;&lt;=50K&quot; ...</code></pre>
-<pre class="r"><code>colSums(is.na(datosAdult))</code></pre>
+<div id="identificació-dinconsistències" class="section level2">
+<h2><span class="header-section-number">3.1</span> Identificació d’inconsistències</h2>
+<p>Busquem persones que diuen que no han treballat mai i han reportat N hores per setmana:</p>
+<pre class="r"><code>indices &lt;- which(dadesAdult$workclass == &quot;Never-worked&quot; &amp; 
+                   dadesAdult$`hour-per-week` &gt; 0)
+dadesAdult[indices, c(2, 13)]</code></pre>
+<pre><code>##          workclass hour-per-week
+## 5362  Never-worked            40
+## 10846 Never-worked            35
+## 14773 Never-worked            30
+## 20338 Never-worked            10
+## 23233 Never-worked            40
+## 32305 Never-worked            40
+## 32315 Never-worked             4</code></pre>
+<p>En aquests casos, assignem a 0 el valor de les hores treballades per setmana:</p>
+<pre class="r"><code>dadesAdult$`hour-per-week`[indices] &lt;- 0</code></pre>
+</div>
+<div id="identificació-de-valors-buits" class="section level2">
+<h2><span class="header-section-number">3.2</span> Identificació de valors buits</h2>
+<p>Per tal de fer una neteja de les dades i comprovar si existeixen valors buits, comencem mirant aquells que són nulls.</p>
+<pre class="r"><code>colSums(is.na(dadesAdult))</code></pre>
 <pre><code>##            age      workclass         fnlwgt      education  education-num 
 ##              0              0              0              0              0 
 ## marital-status     occupation   relationship           race            sex 
 ##              0              0              0              0              0 
 ##   capital-gain   capital-loss  hour-per-week native-country         income 
 ##              0              0              0              0              0</code></pre>
-<pre class="r"><code>colSums(datosAdult == &quot;&quot;)</code></pre>
+<p>Seguim comprovant si existeixen columnes amb una cadena de text buida.</p>
+<pre class="r"><code>colSums(dadesAdult == &quot;&quot;, na.rm=TRUE)</code></pre>
 <pre><code>##            age      workclass         fnlwgt      education  education-num 
 ##              0              0              0              0              0 
 ## marital-status     occupation   relationship           race            sex 
 ##              0              0              0              0              0 
 ##   capital-gain   capital-loss  hour-per-week native-country         income 
 ##              0              0              0              0              0</code></pre>
-<pre class="r"><code>colSums(datosAdult == &quot;?&quot;)</code></pre>
+<p>Finalment, busquem columnes que continguin valors buits indicats amb el valor ‘?’:</p>
+<pre class="r"><code>colSums(dadesAdult == &quot;?&quot;, na.rm=TRUE)</code></pre>
 <pre><code>##            age      workclass         fnlwgt      education  education-num 
 ##              0           1836              0              0              0 
 ## marital-status     occupation   relationship           race            sex 
 ##              0           1843              0              0              0 
 ##   capital-gain   capital-loss  hour-per-week native-country         income 
 ##              0              0              0            583              0</code></pre>
-<pre class="r"><code>table(datosAdult$workclass)</code></pre>
-<pre><code>## 
-##                ?      Federal-gov        Local-gov     Never-worked 
-##             1836              960             2093                7 
-##          Private     Self-emp-inc Self-emp-not-inc        State-gov 
-##            22696             1116             2541             1298 
-##      Without-pay 
-##               14</code></pre>
-<pre class="r"><code># Funció per comprovar el valor més repetit
-
-get_repeated &lt;- function(column){
-  t &lt;- table(column)
-  names(which.max(t))
-}
-
-# Introduim els valors als camps on hi ha un '?'
-
-datosAdult$workclass[datosAdult$workclass==&quot;?&quot;]= get_repeated(datosAdult$workclass)
-datosAdult$`native-country`[datosAdult$`native-country`==&quot;?&quot;]=get_repeated(datosAdult$`native-country`)
-datosAdult$occupation[datosAdult$occupation==&quot;?&quot;]=get_repeated(datosAdult$occupation)</code></pre>
-<pre class="r"><code>colSums(datosAdult == &quot;?&quot;)</code></pre>
+<p>Veiem que a <em>workclass</em>, <em>occupation</em>, i a <em>native-country</em> ens aparexien valors buits. Eliminem aquests atributs i els assignem com a buits:</p>
+<pre class="r"><code>dadesAdult$workclass[which(dadesAdult$workclass == &quot;?&quot;)] &lt;- NA
+dadesAdult$occupation[which(dadesAdult$occupation == &quot;?&quot;)] &lt;- NA
+dadesAdult$`native-country`[which(dadesAdult$`native-country` == &quot;?&quot;)] &lt;- NA</code></pre>
+<p>Comprovem que, efectivament, hem transformat els valors “?” a nuls.</p>
+<pre class="r"><code>colSums(is.na(dadesAdult))</code></pre>
+<pre><code>##            age      workclass         fnlwgt      education  education-num 
+##              0           1836              0              0              0 
+## marital-status     occupation   relationship           race            sex 
+##              0           1843              0              0              0 
+##   capital-gain   capital-loss  hour-per-week native-country         income 
+##              0              0              0            583              0</code></pre>
+<pre class="r"><code>colSums(dadesAdult == &quot;?&quot;, na.rm=TRUE)</code></pre>
 <pre><code>##            age      workclass         fnlwgt      education  education-num 
 ##              0              0              0              0              0 
 ## marital-status     occupation   relationship           race            sex 
 ##              0              0              0              0              0 
 ##   capital-gain   capital-loss  hour-per-week native-country         income 
 ##              0              0              0              0              0</code></pre>
-<pre class="r"><code>table(datosAdult$workclass)</code></pre>
-<pre><code>## 
-##      Federal-gov        Local-gov     Never-worked          Private 
-##              960             2093                7            24532 
-##     Self-emp-inc Self-emp-not-inc        State-gov      Without-pay 
-##             1116             2541             1298               14</code></pre>
+</div>
+<div id="imputació-dels-valors-buits" class="section level2">
+<h2><span class="header-section-number">3.3</span> Imputació dels valors buits</h2>
+<p>Utilitzem el mètode kNN per assignar valors als camps buits, utilitzant els 5 registres més propers:</p>
+<pre class="r"><code>dadesAdult &lt;- kNN(dadesAdult,
+                  variable = c(&quot;workclass&quot;, &quot;occupation&quot;, &quot;native-country&quot;),
+                  k = 5)
+
+summary(dadesAdult)</code></pre>
+<pre><code>##       age                   workclass         fnlwgt       
+##  Min.   :17.00   Private         :24362   Min.   :  12285  
+##  1st Qu.:28.00   Self-emp-not-inc: 2645   1st Qu.: 117827  
+##  Median :37.00   Local-gov       : 2125   Median : 178356  
+##  Mean   :38.58   State-gov       : 1312   Mean   : 189778  
+##  3rd Qu.:48.00   Self-emp-inc    : 1129   3rd Qu.: 237051  
+##  Max.   :90.00   Federal-gov     :  967   Max.   :1484705  
+##                  (Other)         :   21                    
+##         education     education-num                 marital-status 
+##  HS-grad     :10501   Min.   : 1.00   Divorced             : 4443  
+##  Some-college: 7291   1st Qu.: 9.00   Married-AF-spouse    :   23  
+##  Bachelors   : 5355   Median :10.00   Married-civ-spouse   :14976  
+##  Masters     : 1723   Mean   :10.08   Married-spouse-absent:  418  
+##  Assoc-voc   : 1382   3rd Qu.:12.00   Never-married        :10683  
+##  11th        : 1175   Max.   :16.00   Separated            : 1025  
+##  (Other)     : 5134                   Widowed              :  993  
+##            occupation           relationship                   race      
+##  Craft-repair   :4292   Husband       :13193   Amer-Indian-Eskimo:  311  
+##  Prof-specialty :4288   Not-in-family : 8305   Asian-Pac-Islander: 1039  
+##  Exec-managerial:4193   Other-relative:  981   Black             : 3124  
+##  Adm-clerical   :4072   Own-child     : 5068   Other             :  271  
+##  Sales          :3967   Unmarried     : 3446   White             :27816  
+##  Other-service  :3678   Wife          : 1568                             
+##  (Other)        :8071                                                    
+##      sex         capital-gain    capital-loss    hour-per-week  
+##  Female:10771   Min.   :    0   Min.   :   0.0   Min.   : 0.00  
+##  Male  :21790   1st Qu.:    0   1st Qu.:   0.0   1st Qu.:40.00  
+##                 Median :    0   Median :   0.0   Median :40.00  
+##                 Mean   : 1078   Mean   :  87.3   Mean   :40.43  
+##                 3rd Qu.:    0   3rd Qu.:   0.0   3rd Qu.:45.00  
+##                 Max.   :99999   Max.   :4356.0   Max.   :99.00  
+##                                                                 
+##        native-country    income      workclass_imp   occupation_imp 
+##  United-States:29737   &lt;=50K:24720   Mode :logical   Mode :logical  
+##  Mexico       :  657   &gt;50K : 7841   FALSE:30725     FALSE:30718    
+##  Philippines  :  198                 TRUE :1836      TRUE :1843     
+##  Germany      :  137                                                
+##  Canada       :  121                                                
+##  Puerto-Rico  :  114                                                
+##  (Other)      : 1597                                                
+##  native-country_imp
+##  Mode :logical     
+##  FALSE:31978       
+##  TRUE :583         
+##                    
+##                    
+##                    
+## </code></pre>
+</div>
+<div id="detecció-doutliers" class="section level2">
+<h2><span class="header-section-number">3.4</span> Detecció d’outliers</h2>
 <hr />
 <hr />
 </div>
-<div id="analisi-de-les-dades" class="section level1">
+</div>
+<div id="anàlisi-de-les-dades" class="section level1">
 <h1><span class="header-section-number">4</span> Anàlisi de les dades</h1>
+<div id="selecció-dels-grups-de-dades-que-es-volen-analitzarcomparar" class="section level2">
+<h2><span class="header-section-number">4.1</span> Selecció dels grups de dades que es volen analitzar/comparar</h2>
+</div>
+<div id="comprovació-de-la-normalitat-i-homogeneïtat-de-la-variància" class="section level2">
+<h2><span class="header-section-number">4.2</span> Comprovació de la normalitat i homogeneïtat de la variància</h2>
+</div>
+<div id="aplicació-de-proves-estadístiques-per-comparar-els-grups-de-dades." class="section level2">
+<h2><span class="header-section-number">4.3</span> Aplicació de proves estadístiques per comparar els grups de dades.</h2>
+<blockquote>
+<p>En funció de les dades i de l’objectiu de l’estudi, aplicar proves de contrast d’hipòtesis, correlacions, regressions, etc. Aplicar almenys tres mètodes d’anàlisi diferents.</p>
+</blockquote>
 <hr />
 <hr />
 </div>
-<div id="proves-estadistiques" class="section level1">
-<h1><span class="header-section-number">5</span> Proves estadístiques</h1>
+</div>
+<div id="representació-dels-resultats-a-partir-de-taules-i-gràfiques" class="section level1">
+<h1><span class="header-section-number">5</span> Representació dels resultats a partir de taules i gràfiques</h1>
 <hr />
 <hr />
 </div>
@@ -555,6 +702,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

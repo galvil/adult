@@ -18,6 +18,8 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(VIM) # Provides kNN
 ```
 ******
 # Descripció del dataset
@@ -26,118 +28,140 @@ El dataset que utilitzarem per aquesta pràctica és el Adult Data Set que trobe
 
 Informació sobre els atributs:
 
-Llista d'atributs:
+Llista d'atributs i el seu tipus:
 
-\> 50 K, <= 50 K.
+- age: Variable continua.
+- workclass: Categòrica. Possibles valors: *Private, Self-emp-not-inc, Self-emp-inc, Federal-gov, Local-gov, State-gov, Without-pay, Never-worked*.
+- fnlwgt: Variable continua.
+- education: Categòrica. Possibles valors: *Bachelors, Some-college, 11th, HS-grad, Prof-school, Assoc-acdm, Assoc-voc, 9th, 7th-8th, 12th, Masters, 1st-4th, 10th, Doctorate, 5th-6th, Preschool*.
+- education-num: Variable continua.
+- marital-status: Categòrica. Possibles valors: *Married-civ-spouse, Divorced, Never-married, Separated, Widowed, Married-spouse-absent, Married-AF-spouse*.
+- occupation: Categòrica. Possibles valors: *Tech-support, Craft-repair, Other-service, Sales, Exec-managerial, Prof-specialty, Handlers-cleaners, Machine-op-inspct, Adm-clerical, Farming-fishing, Transport-moving, Priv-house-serv, Protective-serv, Armed-Forces*.
+- relationship: Categòrica. Possibles valors: *Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried*.
+- race: Categòrica. Possibles valors: *White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black*.
+- sex: Categòrica: *Female, Male*.
+- capital-gain: Variable continua.
+- capital-loss: Variable continua.
+- hours-per-week: Variable continua.
+- native-country: Categòrica. Possibles valors: *United-States, Cambodia, England, Puerto-Rico, Canada, Germany, Outlying-US(Guam-USVI-etc), India, Japan, Greece, South, China, Cuba, Iran, Honduras, Philippines, Italy, Poland, Jamaica, Vietnam, Mexico, Portugal, Ireland, France, Dominican-Republic, Laos, Ecuador, Taiwan, Haiti, Columbia, Hungary, Guatemala, Nicaragua, Scotland, Thailand, Yugoslavia, El-Salvador, Trinadad&Tobago, Peru, Hong, Holand-Netherlands*.
+- Income: Categòrica. Possibles valors: *$>$ 50 K, $<=$ 50 K*.
 
-- age: continuous.
-- workclass: Private, Self-emp-not-inc, Self-emp-inc, Federal-gov, Local-gov, State-gov, Without-pay, Never-worked.
-- fnlwgt: continuous.
-- education: Bachelors, Some-college, 11th, HS-grad, Prof-school, Assoc-acdm, Assoc-voc, 9th, 7th-8th, 12th, Masters, 1st-4th, 10th, Doctorate, 5th-6th, Preschool.
-- education-num: continuous.
-- marital-status: Married-civ-spouse, Divorced, Never-married, Separated, Widowed, Married-spouse-absent, Married-AF-spouse.
-- occupation: Tech-support, Craft-repair, Other-service, Sales, Exec-managerial, Prof-specialty, Handlers-cleaners, Machine-op-inspct, Adm-clerical, Farming-fishing, Transport-moving, Priv-house-serv, Protective-serv, Armed-Forces.
-- relationship: Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried.
-- race: White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black.
-- sex: Female, Male.
-- capital-gain: continuous.
-- capital-loss: continuous.
-- hours-per-week: continuous.
-- native-country: United-States, Cambodia, England, Puerto-Rico, Canada, Germany, Outlying-US(Guam-USVI-etc), India, Japan, Greece, South, China, Cuba, Iran, Honduras, Philippines, Italy, Poland, Jamaica, Vietnam, Mexico, Portugal, Ireland, France, Dominican-Republic, Laos, Ecuador, Taiwan, Haiti, Columbia, Hungary, Guatemala, Nicaragua, Scotland, Thailand, Yugoslavia, El-Salvador, Trinadad&Tobago, Peru, Hong, Holand-Netherlands.
-
+Com a primer pas carreguem el dataset:
 
 ******
-# Importància i objectius de l'anàlisi
+# Itegració i selecció de les dades d'interès a analitzar
+
+Primer de tot carreguem les dades del conjunt de dades i n'anomenem les columnes:
+
+```{r message= FALSE, warning=FALSE}
+# Carreguem el joc de dades
+dadesAdult <- read.csv('adult.data',stringsAsFactors = FALSE,
+                       header = FALSE, strip.white = TRUE)
+
+# Noms dels atributs
+names(dadesAdult) <- c("age", "workclass", "fnlwgt", "education", "education-num",
+                       "marital-status", "occupation", "relationship", "race",
+                       "sex", "capital-gain", "capital-loss", "hour-per-week",
+                       "native-country", "income")
+
+numericalCols <- c("age", "fnlwgt", "education-num", "capital-gain", "capital-loss",
+                    "hour-per-week")
+categoricalCols <- c("workclass", "education", "marital-status",
+                      "occupation", "relationship", "race", "sex",
+                      "native-country", "income")
+
+summary(dadesAdult)
+```
+
+Un cop carregades les dades, assignem el tipus correcte a les columnes:
+```{r}
+# Convertim a factors les variables categòriques
+for (i in categoricalCols){
+  dadesAdult[,i] <- as.factor(dadesAdult[,i])
+}
+
+summary(dadesAdult)
+```
 
 ******
 
 ******
 # Neteja de les dades
 
-Extraiem les dades de l'enllaç del dataset i una vegada extretes, anomenem les columnes.
-
-```{r message= FALSE, warning=FALSE}
-# Carreguem el joc de dades
-datosAdult <- read.csv('http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data',stringsAsFactors = FALSE, header = FALSE, strip.white = TRUE)
-
-# Noms dels atributs
-names(datosAdult) <- c("age","workclass","fnlwgt","education","education-num","marital-status","occupation","relationship","race","sex","capital-gain","capital-loss","hour-per-week","native-country","income")
-
-str(datosAdult)
+## Identificació d'inconsistències
+Busquem persones que diuen que no han treballat mai i han reportat N hores per setmana:
+```{r}
+indices <- which(dadesAdult$workclass == "Never-worked" & 
+                   dadesAdult$`hour-per-week` > 0)
+dadesAdult[indices, c(2, 13)]
 ```
 
+En aquests casos, assignem a 0 el valor de les hores treballades per setmana:
+```{r}
+dadesAdult$`hour-per-week`[indices] <- 0
+```
+
+## Identificació de valors buits
 Per tal de fer una neteja de les dades i comprovar si existeixen valors buits, comencem mirant aquells que són nulls.
 
 ```{r message= FALSE, warning=FALSE}
-colSums(is.na(datosAdult))
+colSums(is.na(dadesAdult))
 ```
 
-Seguim comprovant si existeixen String buits.
+Seguim comprovant si existeixen columnes amb una cadena de text buida.
 
 ```{r message= FALSE, warning=FALSE}
-colSums(datosAdult == "")
+colSums(dadesAdult == "", na.rm=TRUE)
 ```
 
-Finalment, comprovem si les dades perdudes es representen amb següent signe '?'.
+Finalment, busquem columnes que continguin valors buits indicats amb el valor '?':
 
 ```{r message= FALSE, warning=FALSE}
-colSums(datosAdult == "?")
+colSums(dadesAdult == "?", na.rm=TRUE)
 ```
 
-Veiem que a workclass,occupation i a native-country, ens apareien valors amb el signe '?'.
+Veiem que a *workclass*, *occupation*, i a *native-country* ens aparexien valors buits. Eliminem aquests atributs i els assignem com a buits:
 
-Podem veure la quantitat de '?' que hi ha les diferents columnes esmentades:
-
-```{r message= FALSE, warning=FALSE}
-table(datosAdult$workclass)
-
+```{r}
+dadesAdult$workclass[which(dadesAdult$workclass == "?")] <- NA
+dadesAdult$occupation[which(dadesAdult$occupation == "?")] <- NA
+dadesAdult$`native-country`[which(dadesAdult$`native-country` == "?")] <- NA
 ```
 
-```{r message= FALSE, warning=FALSE}
+Comprovem que, efectivament, hem transformat els valors "?" a nuls.
 
-table(datosAdult$occupation)
+```{r}
+colSums(is.na(dadesAdult))
+colSums(dadesAdult == "?", na.rm=TRUE)
 ```
 
-```{r message= FALSE, warning=FALSE}
-table(datosAdult$`native-country`)
-```
+## Imputació dels valors buits
+Utilitzem el mètode kNN per assignar valors als camps buits, utilitzant els 5 registres més propers:
+```{r}
+dadesAdult <- kNN(dadesAdult,
+                  variable = c("workclass", "occupation", "native-country"),
+                  k = 5)
 
-Per tal de substituir els camps que contenen un ‘?’, buscarem a cada columna el valor que més es repeteixi i l’intoduirem al camp erroni.
-
-
-```{r message= FALSE, warning=FALSE}
-# Funció per comprovar el valor més repetit
-
-get_repeated <- function(column){
-  t <- table(column)
-  names(which.max(t))
-}
-
-# Introduim els valors als camps on hi ha un '?'
-
-datosAdult$workclass[datosAdult$workclass=="?"]= get_repeated(datosAdult$workclass)
-datosAdult$`native-country`[datosAdult$`native-country`=="?"]=get_repeated(datosAdult$`native-country`)
-datosAdult$occupation[datosAdult$occupation=="?"]=get_repeated(datosAdult$occupation)
+summary(dadesAdult)
 ```
 
 
-```{r message= FALSE, warning=FALSE}
-colSums(datosAdult == "?")
-```
-
-```{r message= FALSE, warning=FALSE}
-table(datosAdult$workclass)
-```
-
+## Detecció d'outliers
 
 ******
 ******
 # Anàlisi de les dades
+## Selecció dels grups de dades que es volen analitzar/comparar
+
+## Comprovació de la normalitat i homogeneïtat de la variància
+
+## Aplicació de proves estadístiques per comparar els grups de dades.
+>En funció de les dades i de l'objectiu de l'estudi, aplicar proves de contrast d'hipòtesis, correlacions, regressions, etc. Aplicar almenys tres mètodes d'anàlisi diferents.
 
 ******
 
 ******
-# Proves estadístiques
+# Representació dels resultats a partir de taules i gràfiques
 
 ******
 
