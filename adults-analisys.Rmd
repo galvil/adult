@@ -17,7 +17,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 library(ggplot2)
 library(VIM) # Provides kNN
 ```
@@ -34,7 +34,7 @@ Llista d'atributs i el seu tipus:
 - workclass: Categòrica. Possibles valors: *Private, Self-emp-not-inc, Self-emp-inc, Federal-gov, Local-gov, State-gov, Without-pay, Never-worked*.
 - fnlwgt: Variable continua.
 - education: Categòrica. Possibles valors: *Bachelors, Some-college, 11th, HS-grad, Prof-school, Assoc-acdm, Assoc-voc, 9th, 7th-8th, 12th, Masters, 1st-4th, 10th, Doctorate, 5th-6th, Preschool*.
-- education-num: Variable continua.
+- education-num: Variable numèrica ordinal.
 - marital-status: Categòrica. Possibles valors: *Married-civ-spouse, Divorced, Never-married, Separated, Widowed, Married-spouse-absent, Married-AF-spouse*.
 - occupation: Categòrica. Possibles valors: *Tech-support, Craft-repair, Other-service, Sales, Exec-managerial, Prof-specialty, Handlers-cleaners, Machine-op-inspct, Adm-clerical, Farming-fishing, Transport-moving, Priv-house-serv, Protective-serv, Armed-Forces*.
 - relationship: Categòrica. Possibles valors: *Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried*.
@@ -44,9 +44,18 @@ Llista d'atributs i el seu tipus:
 - capital-loss: Variable continua.
 - hours-per-week: Variable continua.
 - native-country: Categòrica. Possibles valors: *United-States, Cambodia, England, Puerto-Rico, Canada, Germany, Outlying-US(Guam-USVI-etc), India, Japan, Greece, South, China, Cuba, Iran, Honduras, Philippines, Italy, Poland, Jamaica, Vietnam, Mexico, Portugal, Ireland, France, Dominican-Republic, Laos, Ecuador, Taiwan, Haiti, Columbia, Hungary, Guatemala, Nicaragua, Scotland, Thailand, Yugoslavia, El-Salvador, Trinadad&Tobago, Peru, Hong, Holand-Netherlands*.
-- Income: Categòrica. Possibles valors: *$>$ 50 K, $<=$ 50 K*.
+- Income: Categòrica. Possibles valors: *$>$ 50 K, $<=$ 50 K*. Aquesta variable és la que s'intenta predir en l'article original del conjunt de dades.
 
-Com a primer pas carreguem el dataset:
+L'objectiu d'aquest projecte és estudiar la relació que hi ha entre els diferents 
+atributs censals de la població d'Estats Units, i addicionalment com es relacionen amb
+si tenen uns ingressos superiors o inferiors a 50.000 dòlars annuals.
+
+El principal estudi que es vol fer és trobar quina variable és més significativa a
+l'hora d'explicar si els ingressos superen aquest llindar o no. Addicionalment, es
+buscaràn correlacions entre els diferents atributs, com per exemple les hores 
+treballades a la setmana i els guanys de capital. Per últim, s'intentarà demostrar
+si les característiques censals de les persones que es troben en un costat o l'altre
+del llindar d'ingressos són significativament diferents.
 
 ******
 # Itegració i selecció de les dades d'interès a analitzar
@@ -69,8 +78,6 @@ numericalCols <- c("age", "fnlwgt", "education-num", "capital-gain", "capital-lo
 categoricalCols <- c("workclass", "education", "marital-status",
                       "occupation", "relationship", "race", "sex",
                       "native-country", "income")
-
-summary(dadesAdult)
 ```
 
 Un cop carregades les dades, assignem el tipus correcte a les columnes:
@@ -83,6 +90,28 @@ for (i in categoricalCols){
 summary(dadesAdult)
 ```
 
+
+Aquest dataset té una peculiaritat, i és que ens proporciona la variable *fnlwgt*,
+que ens indica el valor estimat de persones en el cens que són similars al registre
+actual. Per tant, s'hauria de tenir en compte aquest valor quan es fan estudis de la
+distribució de les dades, per exemple. Una forma de tenir en compte aquesta dada és
+repetir cada registre aquest nombre de vegades, potser afegint una mica de soroll per
+evitar tenir molts valors idèntics. Tot i això, de cara a aquest estudi, no es tindrà
+en compte aquesta variable. Tampoc es tindran en compte les variables *relationship*
+(que es pot deduïr de *marital status*), ni *education*, equivalent a la variable 
+*education_num*. S'ha optat per mantenir la variable numèrica sobre l'educació ja
+que, al estar expressada de forma numèrica, ens permet mantenir l'ordre dels nivells
+d'estudis. Per tant, eliminem les columnes esmentades:
+
+```{r}
+numericalCols <- c("age", "education-num", "capital-gain", "capital-loss",
+                    "hour-per-week")
+categoricalCols <- c("workclass", "marital-status", "occupation", "race",
+                     "sex", "native-country", "income")
+dadesAdult$relationship <- NULL
+dadesAdult$education <- NULL
+dadesAdult$fnlwgt <- NULL
+```
 ******
 
 ******
@@ -93,7 +122,7 @@ Busquem persones que diuen que no han treballat mai i han reportat N hores per s
 ```{r}
 indices <- which(dadesAdult$workclass == "Never-worked" & 
                    dadesAdult$`hour-per-week` > 0)
-dadesAdult[indices, c(2, 13)]
+dadesAdult[indices, c(2, 10)]
 ```
 
 En aquests casos, assignem a 0 el valor de les hores treballades per setmana:
@@ -146,7 +175,33 @@ summary(dadesAdult)
 ```
 
 
+Per assegurar la consistència, mirem si les dades imputades incompleixen la condició que hem imposat anteriorment, on es comprova si la gent que mai ha treballat havia imputat hores setmanals.
+```{r}
+which(dadesAdult$workclass == "Never-worked" & dadesAdult$`hour-per-week` > 0)
+```
+Veiem que no hem afegit cap inconsistència a les dades en fer la imputació.
+
+
 ## Detecció d'outliers
+
+Busquem valors atípics en el dataset. Per fer-ho, es mostraran les variables 
+numèriques utilitzant gràfics de caixes. Els valors que siguin menors que
+$1,5 * Q_1$ o majors que $1,5 * Q_4$ (amb $Q_n$ sent el quartil N dels valors) es
+consideren outliers.
+
+```{r}
+for (i in numericalCols){
+  boxplot(dadesAdult[,i], main=i)
+  outliers <- boxplot.stats(dadesAdult[,i])$out
+  ran <- range(outliers)
+  print(ran)
+  print(sprintf("%d outliers", length(outliers)))
+  
+  # Uncomment to print the indices of the outliers
+  # indices <- which(dadesAdult[,i] %in% outliers)
+  # print(paste(c("Their indices are ", indices)))
+}
+```
 
 ******
 ******
@@ -157,6 +212,12 @@ summary(dadesAdult)
 
 ## Aplicació de proves estadístiques per comparar els grups de dades.
 >En funció de les dades i de l'objectiu de l'estudi, aplicar proves de contrast d'hipòtesis, correlacions, regressions, etc. Aplicar almenys tres mètodes d'anàlisi diferents.
+
+<!-- Fer un PCA, un MCA, o arbre de decisions per estudiar quin atribut explica més l'etiqueta -->
+
+<!-- Fer un estudi de dues variables chi-squared (p.e. gain > per un sexe o un altre)-->
+
+<!-- Fer un test de chow de les variables separades per label (test de permanència estructural) -->
 
 ******
 
