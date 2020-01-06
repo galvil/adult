@@ -1,0 +1,147 @@
+---
+title: 'Adults'
+author: "Autors: Josep Alòs Pascual i Daniel Galan Vilella"
+date: "Gener 2020"
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+
+  word_document: default
+  pdf_document:
+    highlight: zenburn
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+******
+# Descripció del dataset
+
+El dataset que utilitzarem per aquesta pràctica és el Adult Data Set que trobem en el següent enllaç: https://archive.ics.uci.edu/ml/datasets/Adult
+
+Informació sobre els atributs:
+
+Llista d'atributs:
+
+\> 50 K, <= 50 K.
+
+- age: continuous.
+- workclass: Private, Self-emp-not-inc, Self-emp-inc, Federal-gov, Local-gov, State-gov, Without-pay, Never-worked.
+- fnlwgt: continuous.
+- education: Bachelors, Some-college, 11th, HS-grad, Prof-school, Assoc-acdm, Assoc-voc, 9th, 7th-8th, 12th, Masters, 1st-4th, 10th, Doctorate, 5th-6th, Preschool.
+- education-num: continuous.
+- marital-status: Married-civ-spouse, Divorced, Never-married, Separated, Widowed, Married-spouse-absent, Married-AF-spouse.
+- occupation: Tech-support, Craft-repair, Other-service, Sales, Exec-managerial, Prof-specialty, Handlers-cleaners, Machine-op-inspct, Adm-clerical, Farming-fishing, Transport-moving, Priv-house-serv, Protective-serv, Armed-Forces.
+- relationship: Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried.
+- race: White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black.
+- sex: Female, Male.
+- capital-gain: continuous.
+- capital-loss: continuous.
+- hours-per-week: continuous.
+- native-country: United-States, Cambodia, England, Puerto-Rico, Canada, Germany, Outlying-US(Guam-USVI-etc), India, Japan, Greece, South, China, Cuba, Iran, Honduras, Philippines, Italy, Poland, Jamaica, Vietnam, Mexico, Portugal, Ireland, France, Dominican-Republic, Laos, Ecuador, Taiwan, Haiti, Columbia, Hungary, Guatemala, Nicaragua, Scotland, Thailand, Yugoslavia, El-Salvador, Trinadad&Tobago, Peru, Hong, Holand-Netherlands.
+
+
+******
+# Importància i objectius de l'anàlisi
+
+******
+
+******
+# Neteja de les dades
+
+Extraiem les dades de l'enllaç del dataset i una vegada extretes, anomenem les columnes.
+
+```{r message= FALSE, warning=FALSE}
+# Carreguem el joc de dades
+datosAdult <- read.csv('http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data',stringsAsFactors = FALSE, header = FALSE, strip.white = TRUE)
+
+# Noms dels atributs
+names(datosAdult) <- c("age","workclass","fnlwgt","education","education-num","marital-status","occupation","relationship","race","sex","capital-gain","capital-loss","hour-per-week","native-country","income")
+
+str(datosAdult)
+```
+
+Per tal de fer una neteja de les dades i comprovar si existeixen valors buits, comencem mirant aquells que són nulls.
+
+```{r message= FALSE, warning=FALSE}
+colSums(is.na(datosAdult))
+```
+
+Seguim comprovant si existeixen String buits.
+
+```{r message= FALSE, warning=FALSE}
+colSums(datosAdult == "")
+```
+
+Finalment, comprovem si les dades perdudes es representen amb següent signe '?'.
+
+```{r message= FALSE, warning=FALSE}
+colSums(datosAdult == "?")
+```
+
+Veiem que a workclass,occupation i a native-country, ens apareien valors amb el signe '?'.
+
+Podem veure la quantitat de '?' que hi ha les diferents columnes esmentades:
+
+```{r message= FALSE, warning=FALSE}
+table(datosAdult$workclass)
+
+```
+
+```{r message= FALSE, warning=FALSE}
+
+table(datosAdult$occupation)
+```
+
+```{r message= FALSE, warning=FALSE}
+table(datosAdult$`native-country`)
+```
+
+Per tal de substituir els camps que contenen un ‘?’, buscarem a cada columna el valor que més es repeteixi i l’intoduirem al camp erroni.
+
+
+```{r message= FALSE, warning=FALSE}
+# Funció per comprovar el valor més repetit
+
+get_repeated <- function(column){
+  t <- table(column)
+  names(which.max(t))
+}
+
+# Introduim els valors als camps on hi ha un '?'
+
+datosAdult$workclass[datosAdult$workclass=="?"]= get_repeated(datosAdult$workclass)
+datosAdult$`native-country`[datosAdult$`native-country`=="?"]=get_repeated(datosAdult$`native-country`)
+datosAdult$occupation[datosAdult$occupation=="?"]=get_repeated(datosAdult$occupation)
+```
+
+
+```{r message= FALSE, warning=FALSE}
+colSums(datosAdult == "?")
+```
+
+```{r message= FALSE, warning=FALSE}
+table(datosAdult$workclass)
+```
+
+
+******
+******
+# Anàlisi de les dades
+
+******
+
+******
+# Proves estadístiques
+
+******
+
+******
+# Conclusions
+
+******
