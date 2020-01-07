@@ -269,6 +269,26 @@ No podem acceptar la hipotesis nula ja que p és inferior a 0,05 i per tant, les
 # Representació dels resultats a partir de taules i gràfiques
 
 ******
+```{r message= FALSE, warning=FALSE}
+
+qqnorm(dadesAdult$`capital-gain`, pch = 19, col = "gray50")
+qqline(dadesAdult$`capital-gain`)
+```
+
+
+```{r message= FALSE, warning=FALSE}
+
+library(ggplot2)
+ggplot(data = dadesAdult, aes(x = `capital-gain`)) +
+  geom_histogram(aes(y = ..density.., fill = ..count..)) +
+  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
+  stat_function(fun = dnorm, colour = "firebrick",
+                args = list(mean = mean(dadesAdult$`capital-gain`),
+                            sd = sd(dadesAdult$`capital-gain`))) +
+  ggtitle("Histograma + curva normal teórica") +
+  theme_bw()
+```
+
 
 ******
 # Conclusions
