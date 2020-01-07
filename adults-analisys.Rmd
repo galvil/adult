@@ -21,6 +21,7 @@ knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 library(ggplot2)
 library(VIM) # Provides kNN
 library(FactoMineR)
+library(nortest)
 ```
 ******
 # Descripció del dataset
@@ -205,6 +206,19 @@ for (i in continuousAttrs){
 }
 ```
 
+Veiem que hi ha molts valors considerats oultiers amb la condició que prèviament hem especificat.
+En aquest dataset, però, no els eliminarem ja que esperem trobar unes dades amb unes distribucions
+amb una variància elevada.
+
+
+## Exportació de les dades preprocessades
+
+```{r message= FALSE, warning=FALSE}
+
+write.csv(dadesAdult, "Adults_data_clean.csv")
+
+```
+
 ******
 ******
 # Anàlisi de les dades
@@ -219,6 +233,38 @@ En l'apartat de càrrega de dades, hem s'han eliminat les variables *fnlwgt*,
 els estudis estadístics.
 
 ## Comprovació de la normalitat i homogeneïtat de la variància
+
+Per tal de comprovar la normalitat en les variables quantitatives, utilitzarem la prova Anderson-Darling. per acabar determinant aquelles variables que no segueixen una distribució normal.
+
+```{r message= FALSE, warning=FALSE}
+alpha = 0.05
+col.names = colnames(dadesAdult)
+
+for (i in 1:ncol(dadesAdult)) {
+  if (i == 1) cat("Variables que no segueixen una distribució normal:\n")
+  if (is.integer(dadesAdult[,i]) | is.numeric(dadesAdult[,i])) {
+    p_val = ad.test(dadesAdult[,i])$p.value
+    if (p_val < alpha) {
+      cat(col.names[i])
+    
+      # Format output
+      if (i < ncol(dadesAdult) - 1) cat(", ")
+      if (i %% 3 == 0) cat("\n")
+    }
+  }
+}
+
+```
+
+
+Una vegada comprovada la normalitat, utilitzarem el test de Fligner-Killeen per comprovar la homogeneïtat de les variances mitjançant la mitjana. Comprovem la homogeneïtat de *capital-gain* amb el *sexe*. Considerem com a hipòtesi nul·la que les variàncies són homogènies, i utilitzem una confiança del 95%.
+
+```{r message= FALSE, warning=FALSE}
+
+fligner.test(`capital-gain` ~ `sex`, data=dadesAdult)
+
+```
+No podem acceptar la hipotesis nula ja que p és inferior a 0,05 i per tant, les variàncies no són homogènies.
 
 ## Aplicació de proves estadístiques per comparar els grups de dades.
 >En funció de les dades i de l'objectiu de l'estudi, aplicar proves de contrast d'hipòtesis, correlacions, regressions, etc. Aplicar almenys tres mètodes d'anàlisi diferents.
@@ -297,6 +343,53 @@ Veiem també que l'atribut que s'ha fet servir més vegades per definir el model
 # Representació dels resultats a partir de taules i gràfiques
 
 ******
+
+Podem veure en el següent gràfic com *capital-loss* no compleix el principi de normalitat.
+
+```{r message= FALSE, warning=FALSE}
+
+qqnorm(dadesAdult$`capital-loss`, pch = 19, col = "gray50")
+qqline(dadesAdult$`capital-loss`)
+```
+
+En el següent gràfic, podem veure com *capital-gain* no es distribueix normalment.
+
+```{r message= FALSE, warning=FALSE}
+
+library(ggplot2)
+ggplot(data = dadesAdult, aes(x = `capital-gain`)) +
+  geom_histogram(aes(y = ..density.., fill = ..count..)) +
+  scale_fill_gradient(low = "#DCDCDC", high = "#7C7C7C") +
+  stat_function(fun = dnorm, colour = "firebrick",
+                args = list(mean = mean(dadesAdult$`capital-gain`),
+                            sd = sd(dadesAdult$`capital-gain`))) +
+  ggtitle("Histograma + curva normal teorica") +
+  theme_bw()
+```
+
+```{r message= FALSE, warning=FALSE}
+table(dadesAdult$`occupation`)
+```
+
+```{r message= FALSE, warning=FALSE}
+table(dadesAdult$`marital-status`)
+```
+
+Igualment, podem veure la freqüència d'*income*:
+
+```{r message= FALSE, warning=FALSE}
+df <- as.data.frame(table(dadesAdult$income))
+colnames(df) <- c("income", "freq")
+pie <- ggplot(df, aes(x = "", y=freq, fill = factor(income))) + 
+  geom_bar(width = 1, stat = "identity") +
+  theme(axis.line = element_blank(), 
+        plot.title = element_text(hjust=0.5)) + 
+  labs(fill="income", 
+       x=NULL, 
+       y=NULL, 
+       title="Income chart")
+pie + coord_polar(theta = "y", start=0)
+```
 
 ******
 # Conclusions
