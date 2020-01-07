@@ -20,6 +20,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 library(ggplot2)
 library(VIM) # Provides kNN
+library(FactoMineR)
 ```
 ******
 # Descripció del dataset
@@ -53,9 +54,9 @@ si tenen uns ingressos superiors o inferiors a 50.000 dòlars annuals.
 El principal estudi que es vol fer és trobar quina variable és més significativa a
 l'hora d'explicar si els ingressos superen aquest llindar o no. Addicionalment, es
 buscaràn correlacions entre els diferents atributs, com per exemple les hores 
-treballades a la setmana i els guanys de capital. Per últim, s'intentarà demostrar
-si les característiques censals de les persones que es troben en un costat o l'altre
-del llindar d'ingressos són significativament diferents.
+treballades a la setmana i els guanys de capital. Per últim, s'intentarà trobar 
+regles que ens intentin explicar si una persona guanyarà més o menys de llindar de 
+50.000 dòlars annuals.
 
 ******
 # Itegració i selecció de les dades d'interès a analitzar
@@ -185,12 +186,13 @@ Veiem que no hem afegit cap inconsistència a les dades en fer la imputació.
 ## Detecció d'outliers
 
 Busquem valors atípics en el dataset. Per fer-ho, es mostraran les variables 
-numèriques utilitzant gràfics de caixes. Els valors que siguin menors que
+continues utilitzant gràfics de caixes. Els valors que siguin menors que
 $1,5 * Q_1$ o majors que $1,5 * Q_4$ (amb $Q_n$ sent el quartil N dels valors) es
 consideren outliers.
 
 ```{r}
-for (i in numericalCols){
+continuousAttrs <- c("age", "capital-gain", "capital-loss", "hour-per-week")
+for (i in continuousAttrs){
   boxplot(dadesAdult[,i], main=i)
   outliers <- boxplot.stats(dadesAdult[,i])$out
   ran <- range(outliers)
@@ -213,11 +215,73 @@ for (i in numericalCols){
 ## Aplicació de proves estadístiques per comparar els grups de dades.
 >En funció de les dades i de l'objectiu de l'estudi, aplicar proves de contrast d'hipòtesis, correlacions, regressions, etc. Aplicar almenys tres mètodes d'anàlisi diferents.
 
-<!-- Fer un PCA, un MCA, o arbre de decisions per estudiar quin atribut explica més l'etiqueta -->
+### Estudi de l'impacte dels atributs en la variança d'*income*
+Primer de tot, intentem trobar quina variable explica més la variança en la variable 
+*income*. Per fer-ho, utilitzarem l'anàlisi PCA (*Principal Component Analysis*) amb 
+les dades numèriques, i l'anàlisi MCA (*Multiple Correspondence Analysis*) per les 
+variables categòriques.
+```{r}
+dades.pca <- prcomp(dadesAdult[,numericalCols], center=TRUE, scale=TRUE)
+summary(dades.pca)
+```
 
-<!-- Fer un estudi de dues variables chi-squared (p.e. gain > per un sexe o un altre)-->
+Com que s'han fet servir 5 variables en l'anàlisi PCA, i el resultat són 5
+components que expliquen un 90% de la variança, veiem que no ens ha servit per reduïr
+la dimensionalitat del dataset, però aquestes 5 variables tenen un gran impacte en la
+variança.
 
-<!-- Fer un test de chow de les variables separades per label (test de permanència estructural) -->
+```{r}
+dades.mca <- MCA(dadesAdult[,categoricalCols], graph=FALSE)
+head(dades.mca$eig)
+```
+En l'anàlisi MCA, en canvi, amb les 5 components principals només podem explicar un 
+10% de la variança.
+
+### Estudi de correlació
+Volem estudiar si la variable *capital-gain* i la variable *sex* són independents o 
+no. Per fer-ho, es farà un estudi amb la següent hipòtesi: "els guanys de capital per persones de sexe masculí segueix la mateixa distribució per les persones de sexe femení".
+
+Formalitzem l'estudi estadístic:
+$$
+H_0: \mu_{masculi} = \mu_{femeni}
+$$
+$$
+H_1: \mu_{masculi} \ne \mu_{femeni}
+$$
+
+Segons els tests de normalitat realitzats anteriorment, no podem assumir normalitat en la variable *capital-gain*. Per tant, utilitzarem el test de suma de rangs de Wilcoxon (o test U de Mann-Whitney) amb una confiança del 95%.
+
+```{r}
+gainsHomes <- dadesAdult$`capital-gain`[which(dadesAdult$sex == "Male")]
+gainsDones <- dadesAdult$`capital-gain`[which(dadesAdult$sex == "Female")]
+
+wilcox.test(gainsHomes, gainsDones, correct=FALSE)
+```
+
+El valor p és més petit de 0,05; i per tant rebutgem $H_0$.
+
+
+### Regles del dataset
+L'últim estudi que es farà ens servirà per extreure regles explicatives de la 
+variable *income* a partir dels altres atributs. Per fer-ho, utilitzarem el model
+per crear àrbres de decisió C5.0.
+```{r}
+y <- dadesAdult[,12]
+X <- dadesAdult[,1:11]
+
+model <- C50::C5.0(X, y, rules=TRUE, control=C50::C5.0Control(
+  seed=555,
+  CF=.01,
+  noGlobalPruning=FALSE
+))
+summary(model)
+```
+
+El model ens ha generat 21 regles que descriuen el dataset. Per exemple, la regla 13:
+$$ 4650 \lt capitalGain \lt 4787 \implies income \gt 50K $$
+ens indica que quan el capital es troba en aquest rang, amb un 96,4% de probabilitat la persona tindrà uns ingressos anuals superiors a 50.000 dòlars.
+
+Veiem també que l'atribut que s'ha fet servir més vegades per definir el model és el nivell d'educació.
 
 ******
 
@@ -228,5 +292,4 @@ for (i in numericalCols){
 
 ******
 # Conclusions
-
 ******
