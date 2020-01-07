@@ -244,13 +244,15 @@ for (i in 1:ncol(dadesAdult)) {
 ```
 
 
-Una vegada comprovada la normalitat, utilitzarem el test de Fligner-Killeen per comprovar la homogeneïtat de les variances. Comprovem la homogeneïtat de 
+Una vegada comprovada la normalitat, utilitzarem el test de Fligner-Killeen per comprovar la homogeneïtat de les variances mitjançant la mitjana. Comprovem la homogeneïtat de capital-gain amb el sexe.
 
 ```{r message= FALSE, warning=FALSE}
 
-fligner.test( ~ , data = dadesAdult)
+fligner.test(`capital-gain` ~ `sex`, data=dadesAdult)
 
 ```
+
+No podem acceptar la hipotesis nula ja que p és inferior a 0,05 i per tant, les variàncies no són homogènies.
 
 ## Aplicació de proves estadístiques per comparar els grups de dades.
 >En funció de les dades i de l'objectiu de l'estudi, aplicar proves de contrast d'hipòtesis, correlacions, regressions, etc. Aplicar almenys tres mètodes d'anàlisi diferents.
