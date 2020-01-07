@@ -49,14 +49,14 @@ Llista d'atributs i el seu tipus:
 
 L'objectiu d'aquest projecte és estudiar la relació que hi ha entre els diferents 
 atributs censals de la població d'Estats Units, i addicionalment com es relacionen amb
-si tenen uns ingressos superiors o inferiors a 50.000 dòlars annuals.
+si tenen uns ingressos superiors o inferiors a 50.000 dòlars anuals.
 
 El principal estudi que es vol fer és trobar quina variable és més significativa a
 l'hora d'explicar si els ingressos superen aquest llindar o no. Addicionalment, es
 buscaràn correlacions entre els diferents atributs, com per exemple les hores 
 treballades a la setmana i els guanys de capital. Per últim, s'intentarà trobar 
 regles que ens intentin explicar si una persona guanyarà més o menys de llindar de 
-50.000 dòlars annuals.
+50.000 dòlars anuals.
 
 ******
 # Itegració i selecció de les dades d'interès a analitzar
@@ -209,6 +209,14 @@ for (i in continuousAttrs){
 ******
 # Anàlisi de les dades
 ## Selecció dels grups de dades que es volen analitzar/comparar
+En aquest estudi s'analitzaran diferents atributs del cens per tal de trobar una
+explicació a si una persona guanya més o menys de 50.000 dòlars anuals. Per fer
+aquest estudi, primer de tot s'estudiarà la normalitat i homogeneïtat dels diferents
+atributs i després s'estudiaran les dades censals a partir d'anàlisis estadístics. 
+
+En l'apartat de càrrega de dades, hem s'han eliminat les variables *fnlwgt*,
+*relationship* i *education*. Totes les altres variables seran utilitzades en
+els estudis estadístics.
 
 ## Comprovació de la normalitat i homogeneïtat de la variància
 
