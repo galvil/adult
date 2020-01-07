@@ -9,7 +9,8 @@ The repository contains the following files:
 - adult.Rproj: R-Studio project file
 - adult.data: The original dataset
 - adults-analysis.Rmd: The R markdown file that performs all the cleaning
-- adults-analysis.html: The final report (compiled from the Rmd file)
+- adults-analysis.html: The (html) final report (compiled from the Rmd file)
+- adults-analysis.pdf: The (pdf) final report (compiled from the Rmd file)
 
 # Authors
 Josep Alòs Pascual (@josepalos)
