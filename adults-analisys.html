@@ -584,21 +584,21 @@ dadesAdult$`native-country`[which(dadesAdult$`native-country` == &quot;?&quot;)]
 
 summary(dadesAdult)</code></pre>
 <pre><code>##       age                   workclass     education-num  
-##  Min.   :17.00   Private         :24355   Min.   : 1.00  
-##  1st Qu.:28.00   Self-emp-not-inc: 2655   1st Qu.: 9.00  
-##  Median :37.00   Local-gov       : 2121   Median :10.00  
-##  Mean   :38.58   State-gov       : 1309   Mean   :10.08  
-##  3rd Qu.:48.00   Self-emp-inc    : 1138   3rd Qu.:12.00  
-##  Max.   :90.00   Federal-gov     :  962   Max.   :16.00  
+##  Min.   :17.00   Private         :24340   Min.   : 1.00  
+##  1st Qu.:28.00   Self-emp-not-inc: 2670   1st Qu.: 9.00  
+##  Median :37.00   Local-gov       : 2119   Median :10.00  
+##  Mean   :38.58   State-gov       : 1308   Mean   :10.08  
+##  3rd Qu.:48.00   Self-emp-inc    : 1139   3rd Qu.:12.00  
+##  Max.   :90.00   Federal-gov     :  964   Max.   :16.00  
 ##                  (Other)         :   21                  
 ##                marital-status            occupation  
-##  Divorced             : 4443   Prof-specialty :4278  
-##  Married-AF-spouse    :   23   Craft-repair   :4275  
-##  Married-civ-spouse   :14976   Exec-managerial:4193  
-##  Married-spouse-absent:  418   Adm-clerical   :4069  
-##  Never-married        :10683   Sales          :3928  
-##  Separated            : 1025   Other-service  :3752  
-##  Widowed              :  993   (Other)        :8066  
+##  Divorced             : 4443   Prof-specialty :4295  
+##  Married-AF-spouse    :   23   Craft-repair   :4268  
+##  Married-civ-spouse   :14976   Exec-managerial:4195  
+##  Married-spouse-absent:  418   Adm-clerical   :4070  
+##  Never-married        :10683   Sales          :3908  
+##  Separated            : 1025   Other-service  :3747  
+##  Widowed              :  993   (Other)        :8078  
 ##                  race           sex         capital-gain  
 ##  Amer-Indian-Eskimo:  311   Female:10771   Min.   :    0  
 ##  Asian-Pac-Islander: 1039   Male  :21790   1st Qu.:    0  
@@ -609,12 +609,12 @@ summary(dadesAdult)</code></pre>
 ##                                                           
 ##   capital-loss    hour-per-week         native-country    income     
 ##  Min.   :   0.0   Min.   : 0.00   United-States:29737   &lt;=50K:24720  
-##  1st Qu.:   0.0   1st Qu.:40.00   Mexico       :  658   &gt;50K : 7841  
+##  1st Qu.:   0.0   1st Qu.:40.00   Mexico       :  657   &gt;50K : 7841  
 ##  Median :   0.0   Median :40.00   Philippines  :  198                
 ##  Mean   :  87.3   Mean   :40.43   Germany      :  137                
 ##  3rd Qu.:   0.0   3rd Qu.:45.00   Canada       :  121                
 ##  Max.   :4356.0   Max.   :99.00   Puerto-Rico  :  114                
-##                                   (Other)      : 1596                
+##                                   (Other)      : 1597                
 ##  workclass_imp   occupation_imp  native-country_imp
 ##  Mode :logical   Mode :logical   Mode :logical     
 ##  FALSE:30725     FALSE:30718     FALSE:31978       
@@ -723,12 +723,12 @@ summary(dades.pca)</code></pre>
 <pre class="r"><code>dades.mca &lt;- MCA(dadesAdult[,categoricalCols], graph=FALSE)
 head(dades.mca$eig)</code></pre>
 <pre><code>##       eigenvalue percentage of variance cumulative percentage of variance
-## dim 1  0.3090423               3.004578                          3.004578
-## dim 2  0.2526102               2.455933                          5.460511
-## dim 3  0.2178067               2.117565                          7.578076
-## dim 4  0.1867365               1.815494                          9.393569
-## dim 5  0.1791921               1.742146                         11.135715
-## dim 6  0.1774387               1.725099                         12.860814</code></pre>
+## dim 1  0.3091703               3.005822                          3.005822
+## dim 2  0.2526344               2.456168                          5.461990
+## dim 3  0.2177280               2.116800                          7.578790
+## dim 4  0.1868325               1.816427                          9.395217
+## dim 5  0.1792930               1.743127                         11.138344
+## dim 6  0.1775993               1.726659                         12.865003</code></pre>
 <p>En l’anàlisi MCA, en canvi, amb les 5 components principals només podem explicar un 10% de la variança.</p>
 </div>
 <div id="estudi-de-correlació" class="section level3">
@@ -770,7 +770,7 @@ summary(model)</code></pre>
 ##  = 555, CF = 0.01, noGlobalPruning = FALSE))
 ## 
 ## 
-## C5.0 [Release 2.07 GPL Edition]      Tue Jan  7 22:26:50 2020
+## C5.0 [Release 2.07 GPL Edition]      Tue Jan  7 23:08:34 2020
 ## -------------------------------
 ## 
 ## Class specified by attribute `outcome'
@@ -800,83 +800,74 @@ summary(model)</code></pre>
 ##  capital-gain &lt;= 5060
 ##  -&gt;  class &lt;=50K  [0.988]
 ## 
-## Rule 5: (8731/283, lift 1.3)
-##  age &lt;= 28
-##  capital-gain &lt;= 5060
-##  capital-loss &lt;= 1762
-##  -&gt;  class &lt;=50K  [0.967]
-## 
-## Rule 6: (17199/797, lift 1.3)
+## Rule 5: (17151/780, lift 1.3)
 ##  marital-status in {Divorced, Married-spouse-absent, Never-married,
 ##                            Separated, Widowed}
 ##  capital-gain &lt;= 6849
-##  capital-loss &lt;= 2352
+##  capital-loss &lt;= 2206
 ##  -&gt;  class &lt;=50K  [0.954]
 ## 
-## Rule 7: (5063/247, lift 1.3)
-##  capital-gain &lt;= 3103
-##  capital-loss &lt;= 1762
-##  hour-per-week &lt;= 31
-##  -&gt;  class &lt;=50K  [0.951]
-## 
-## Rule 8: (13633/1427, lift 1.2)
-##  occupation in {Craft-repair, Farming-fishing, Handlers-cleaners,
-##                        Machine-op-inspct, Other-service, Priv-house-serv,
-##                        Transport-moving}
-##  capital-gain &lt;= 3103
-##  capital-loss &lt;= 1762
-##  -&gt;  class &lt;=50K  [0.895]
-## 
-## Rule 9: (503/60, lift 1.2)
+## Rule 6: (503/60, lift 1.2)
 ##  capital-loss &gt; 625
 ##  capital-loss &lt;= 1762
 ##  -&gt;  class &lt;=50K  [0.879]
 ## 
-## Rule 10: (24494/3932, lift 1.1)
-##  education-num &lt;= 12
-##  -&gt;  class &lt;=50K  [0.839]
+## Rule 7: (30983/6345, lift 1.0)
+##  capital-gain &lt;= 5060
+##  -&gt;  class &lt;=50K  [0.795]
 ## 
-## Rule 11: (1399/20, lift 4.1)
+## Rule 8: (1399/20, lift 4.1)
 ##  capital-gain &gt; 6849
 ##  -&gt;  class &gt;50K  [0.985]
 ## 
-## Rule 12: (585/14, lift 4.0)
+## Rule 9: (585/14, lift 4.0)
 ##  marital-status = Married-civ-spouse
 ##  capital-loss &gt; 1762
 ##  capital-loss &lt;= 1980
 ##  -&gt;  class &gt;50K  [0.974]
 ## 
-## Rule 13: (26, lift 4.0)
-##  capital-gain &gt; 4650
-##  capital-gain &lt;= 4787
-##  -&gt;  class &gt;50K  [0.964]
+## Rule 10: (398/13, lift 4.0)
+##  education-num &gt; 12
+##  marital-status = Married-civ-spouse
+##  capital-loss &gt; 1762
+##  -&gt;  class &gt;50K  [0.965]
 ## 
-## Rule 14: (1362/108, lift 3.8)
+## Rule 11: (1362/108, lift 3.8)
 ##  marital-status in {Married-AF-spouse, Married-civ-spouse}
 ##  capital-gain &gt; 4101
 ##  -&gt;  class &gt;50K  [0.920]
 ## 
-## Rule 15: (97/7, lift 3.8)
+## Rule 12: (97/7, lift 3.8)
 ##  capital-gain &gt; 2993
 ##  capital-gain &lt;= 3103
 ##  -&gt;  class &gt;50K  [0.919]
 ## 
-## Rule 16: (53/10, lift 3.3)
+## Rule 13: (46/3, lift 3.8)
 ##  marital-status in {Divorced, Married-spouse-absent, Never-married,
 ##                            Separated, Widowed}
 ##  capital-loss &gt; 2352
-##  -&gt;  class &gt;50K  [0.800]
+##  capital-loss &lt;= 3683
+##  -&gt;  class &gt;50K  [0.917]
 ## 
-## Rule 17: (3529/751, lift 3.3)
+## Rule 14: (3353/688, lift 3.3)
 ##  age &gt; 28
 ##  education-num &gt; 12
 ##  marital-status in {Married-AF-spouse, Married-civ-spouse}
-##  occupation in {Adm-clerical, Exec-managerial, Prof-specialty,
-##                        Protective-serv, Sales, Tech-support}
+##  occupation in {Exec-managerial, Prof-specialty, Protective-serv, Sales,
+##                        Tech-support}
 ##  hour-per-week &gt; 31
-##  -&gt;  class &gt;50K  [0.787]
+##  -&gt;  class &gt;50K  [0.795]
 ## 
-## Rule 18: (3715/912, lift 3.1)
+## Rule 15: (3491/747, lift 3.3)
+##  age &gt; 25
+##  education-num &gt; 12
+##  marital-status in {Married-AF-spouse, Married-civ-spouse}
+##  occupation in {Exec-managerial, Prof-specialty, Protective-serv, Sales,
+##                        Tech-support}
+##  hour-per-week &gt; 31
+##  -&gt;  class &gt;50K  [0.786]
+## 
+## Rule 16: (3712/909, lift 3.1)
 ##  age &gt; 33
 ##  age &lt;= 62
 ##  workclass in {Federal-gov, Local-gov, Private, Self-emp-inc}
@@ -885,9 +876,9 @@ summary(model)</code></pre>
 ##  occupation in {Adm-clerical, Exec-managerial, Prof-specialty,
 ##                        Protective-serv, Sales, Tech-support}
 ##  hour-per-week &gt; 34
-##  -&gt;  class &gt;50K  [0.754]
+##  -&gt;  class &gt;50K  [0.755]
 ## 
-## Rule 19: (4693/1403, lift 2.9)
+## Rule 17: (4688/1399, lift 2.9)
 ##  age &gt; 33
 ##  age &lt;= 62
 ##  workclass in {Federal-gov, Local-gov, Private, Self-emp-inc}
@@ -897,11 +888,7 @@ summary(model)</code></pre>
 ##  hour-per-week &gt; 34
 ##  -&gt;  class &gt;50K  [0.701]
 ## 
-## Rule 20: (199/65, lift 2.8)
-##  capital-loss &gt; 2206
-##  -&gt;  class &gt;50K  [0.672]
-## 
-## Rule 21: (41/15, lift 2.6)
+## Rule 18: (41/15, lift 2.6)
 ##  education-num &lt;= 12
 ##  marital-status = Married-civ-spouse
 ##  capital-loss &gt; 1340
@@ -917,29 +904,31 @@ summary(model)</code></pre>
 ##    ----------------
 ##      No      Errors
 ## 
-##      21 4317(13.3%)   &lt;&lt;
+##      18 4291(13.2%)   &lt;&lt;
 ## 
 ## 
 ##     (a)   (b)    &lt;-classified as
 ##    ----  ----
-##   23502  1218    (a): class &lt;=50K
-##    3099  4742    (b): class &gt;50K
+##   23529  1191    (a): class &lt;=50K
+##    3100  4741    (b): class &gt;50K
 ## 
 ## 
 ##  Attribute usage:
 ## 
-##   86.06% education-num
-##   81.03% capital-gain
-##   77.80% capital-loss
-##   73.10% marital-status
-##   59.79% occupation
-##   44.73% age
-##   33.47% hour-per-week
-##   14.41% workclass
+##  100.00% capital-gain
+##   73.19% marital-status
+##   55.57% capital-loss
+##   18.16% age
+##   18.16% occupation
+##   18.16% hour-per-week
+##   15.40% education-num
+##   14.40% workclass
 ## 
 ## 
 ## Time: 0.3 secs</code></pre>
-<p>El model ens ha generat 21 regles que descriuen el dataset. Per exemple, la regla 13: <span class="math display">\[ 4650 \lt capitalGain \lt 4787 \implies income \gt 50K \]</span> ens indica que quan el capital es troba en aquest rang, amb un 96,4% de probabilitat la persona tindrà uns ingressos anuals superiors a 50.000 dòlars.</p>
+<p>El model ens ha generat multiples regles que descriuen el dataset. Per exemple, la regla: <span class="math display">\[
+4650 &lt; capitalGain &lt;= 3103 \implies income &gt;50K
+\]</span> ens indica que quan el capital es troba en aquest rang, amb un 96,4% de probabilitat la persona tindrà uns ingressos anuals superiors a 50.000 dòlars.</p>
 <p>Veiem també que l’atribut que s’ha fet servir més vegades per definir el model és el nivell d’educació.</p>
 <hr />
 <hr />
@@ -967,13 +956,13 @@ ggplot(data = dadesAdult, aes(x = `capital-gain`)) +
 <pre class="r"><code>table(dadesAdult$`occupation`)</code></pre>
 <pre><code>## 
 ##                 ?      Adm-clerical      Armed-Forces      Craft-repair 
-##                 0              4069                 9              4275 
+##                 0              4070                 9              4268 
 ##   Exec-managerial   Farming-fishing Handlers-cleaners Machine-op-inspct 
-##              4193              1046              1460              2127 
+##              4195              1050              1463              2114 
 ##     Other-service   Priv-house-serv    Prof-specialty   Protective-serv 
-##              3752               156              4278               655 
+##              3747               163              4295               657 
 ##             Sales      Tech-support  Transport-moving 
-##              3928               953              1660</code></pre>
+##              3908               963              1659</code></pre>
 <pre class="r"><code>table(dadesAdult$`marital-status`)</code></pre>
 <pre><code>## 
 ##              Divorced     Married-AF-spouse    Married-civ-spouse 

@@ -1,19 +1,18 @@
 ---
-title: 'Adults'
-author: "Autors: Josep Alòs Pascual i Daniel Galan Vilella"
+title: "Adults"
+author: 'Autors: Josep Alòs Pascual i Daniel Galan Vilella'
 date: "Gener 2020"
 output:
+  pdf_document:
+    highlight: zenburn
+    toc: yes
+  word_document: default
   html_document:
     highlight: default
     number_sections: yes
     theme: cosmo
     toc: yes
     toc_depth: 2
-
-  word_document: default
-  pdf_document:
-    highlight: zenburn
-    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -331,8 +330,10 @@ model <- C50::C5.0(X, y, rules=TRUE, control=C50::C5.0Control(
 summary(model)
 ```
 
-El model ens ha generat 21 regles que descriuen el dataset. Per exemple, la regla 13:
-$$ 4650 \lt capitalGain \lt 4787 \implies income \gt 50K $$
+El model ens ha generat multiples regles que descriuen el dataset. Per exemple, la regla:
+$$
+4650 < capitalGain <= 3103 \implies income >50K
+$$
 ens indica que quan el capital es troba en aquest rang, amb un 96,4% de probabilitat la persona tindrà uns ingressos anuals superiors a 50.000 dòlars.
 
 Veiem també que l'atribut que s'ha fet servir més vegades per definir el model és el nivell d'educació.
