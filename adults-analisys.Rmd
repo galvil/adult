@@ -203,12 +203,54 @@ for (i in numericalCols){
 }
 ```
 
+## Exportació de les dades preprocessades
+
+```{r message= FALSE, warning=FALSE}
+
+write.csv(dadesAdult, "Adults_data_clean.csv")
+
+```
+
 ******
 ******
 # Anàlisi de les dades
 ## Selecció dels grups de dades que es volen analitzar/comparar
 
 ## Comprovació de la normalitat i homogeneïtat de la variància
+
+Per tal de comprovar la normalitat en les variables quantitatives, utilitzarem la prova Anderson-Darling. per acabar determinant aquelles variables que no segueixen una distribució normal.
+
+```{r message= FALSE, warning=FALSE}
+# install.packages('nortest')
+library(nortest)
+
+alpha = 0.05
+col.names = colnames(dadesAdult)
+
+for (i in 1:ncol(dadesAdult)) {
+  if (i == 1) cat("Variables que no siguen una distribución normal:\n")
+  if (is.integer(dadesAdult[,i]) | is.numeric(dadesAdult[,i])) {
+    p_val = ad.test(dadesAdult[,i])$p.value
+    if (p_val < alpha) {
+      cat(col.names[i])
+    
+      # Format output
+      if (i < ncol(dadesAdult) - 1) cat(", ")
+      if (i %% 3 == 0) cat("\n")
+    }
+  }
+}
+
+```
+
+
+Una vegada comprovada la normalitat, utilitzarem el test de Fligner-Killeen per comprovar la homogeneïtat de les variances. Comprovem la homogeneïtat de 
+
+```{r message= FALSE, warning=FALSE}
+
+fligner.test( ~ , data = dadesAdult)
+
+```
 
 ## Aplicació de proves estadístiques per comparar els grups de dades.
 >En funció de les dades i de l'objectiu de l'estudi, aplicar proves de contrast d'hipòtesis, correlacions, regressions, etc. Aplicar almenys tres mètodes d'anàlisi diferents.
