@@ -269,12 +269,16 @@ No podem acceptar la hipotesis nula ja que p és inferior a 0,05 i per tant, les
 # Representació dels resultats a partir de taules i gràfiques
 
 ******
+
+Podem veure en el següent gràfic com capital-loss no compleix el principi de normalitat.
+
 ```{r message= FALSE, warning=FALSE}
 
-qqnorm(dadesAdult$`capital-gain`, pch = 19, col = "gray50")
-qqline(dadesAdult$`capital-gain`)
+qqnorm(dadesAdult$`capital-loss`, pch = 19, col = "gray50")
+qqline(dadesAdult$`capital-loss`)
 ```
 
+En el següent gràfic, podem veure com capital-gain no es distribueix normalment.
 
 ```{r message= FALSE, warning=FALSE}
 
@@ -285,10 +289,36 @@ ggplot(data = dadesAdult, aes(x = `capital-gain`)) +
   stat_function(fun = dnorm, colour = "firebrick",
                 args = list(mean = mean(dadesAdult$`capital-gain`),
                             sd = sd(dadesAdult$`capital-gain`))) +
-  ggtitle("Histograma + curva normal teórica") +
+  ggtitle("Histograma + curva normal teorica") +
   theme_bw()
 ```
 
+
+
+```{r message= FALSE, warning=FALSE}
+
+table(dadesAdult$`occupation`)
+```
+```{r message= FALSE, warning=FALSE}
+
+table(dadesAdult$`marital-status`)
+```
+
+Igualment, podem veure la freqüència de income:
+
+```{r message= FALSE, warning=FALSE}
+df <- as.data.frame(table(dadesAdult$income))
+colnames(df) <- c("income", "freq")
+pie <- ggplot(df, aes(x = "", y=freq, fill = factor(income))) + 
+  geom_bar(width = 1, stat = "identity") +
+  theme(axis.line = element_blank(), 
+        plot.title = element_text(hjust=0.5)) + 
+  labs(fill="income", 
+       x=NULL, 
+       y=NULL, 
+       title="Income chart")
+pie + coord_polar(theta = "y", start=0)
+```
 
 ******
 # Conclusions
